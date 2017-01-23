@@ -1,0 +1,30 @@
+---
+- hosts: all
+  become: yes
+  handlers:
+  - name: start httpd server
+    service: name=httpd state=restarted
+  tasks:
+  - name: Install apache webserver with development packages
+    yum: name={{ item }} state=present
+    items:
+    - httpd
+    - httpd-devel
+  - name: Copy config file and index.html file.
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0755
+    items:
+    - {
+    src: "/home/chinni505/httpd.conf",
+    dest: "/etc/httpd/conf/httpd.conf"
+    }
+    - {
+    src: "/home/chinni505/index.html",
+    dest: "/var/www/html/"
+    }
+    notify:
+    - start httpd server
